@@ -1,10 +1,13 @@
 from datetime import datetime
 from os import makedirs, path
 from csv import DictWriter
-from requests import post
+from requests import post, get
 from copy import deepcopy
+from urllib.request import urlretrieve
+from urllib.request import urlopen
 
 LIMIT_ONE_REQ = 5
+BASE_URL = '/data'
 
 FIELDS_DATA = {
     'tender_number': 'Номер тендера',
@@ -122,6 +125,7 @@ def get_docs_tender(id):
         for document in item['procedure']['documents']:
             document_data = {
                 'title': document['title'],
+                'extension': document['extension'],
                 'url': document['uri']
             }
             docs_tender.append(document_data)
@@ -155,17 +159,18 @@ def get_list_tenders(name, offset):
     return list_tenders
 
 
-def create_csv(name):
-    dir_path = path.dirname(path.realpath(__file__))
-    makedirs(f'{dir_path}/data', exist_ok=True)
+def create_dir_tenders(name):
+    base_path = path.dirname(path.realpath(__file__))
     now = datetime.now().strftime("%d%m%Y%H%M%S")
-    file_name = f'{dir_path}\\data\\{name}_{now}.csv'
-    file = open(file_name, "w", newline='', encoding='utf-8-sig')
+    dir_path = f'{base_path}{BASE_URL}/{name}_{now}'
+    makedirs(dir_path, exist_ok=True)
+    file_name = f'{dir_path}\\purchase.csv'
+    sheet_file = open(file_name, "w", newline='', encoding='utf-8-sig')
 
-    writer = DictWriter(file, fieldnames=FIELDS)
+    writer = DictWriter(sheet_file, fieldnames=FIELDS)
     writer.writerow(FIELDS_DATA)
 
-    return writer, file
+    return writer, sheet_file, dir_path
 
 
 def add_row(data, writer):
@@ -178,4 +183,20 @@ def add_row(data, writer):
     values['documents'] = ', '.join(documents)
     writer.writerow(values)
 
-    return values['tender_number'], values['object']
+    return values['tender_number'], values['object'], data['documents']
+
+
+def download_docs(id, docs, dir_path):
+    if len(docs) == 0:
+        return
+    docs_dir = f'{dir_path}/{id}'
+
+    for doc in docs:
+        name_file = f"{doc['title'].split('.')[0]}.{doc['extension']}"
+        try:
+            bin_file = get(doc['url'])
+        except:
+            continue
+        makedirs(docs_dir, exist_ok=True)
+        with open(f'{docs_dir}/{name_file}', "wb") as file:
+            file.write(bin_file.content)
