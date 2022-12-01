@@ -206,6 +206,7 @@ parser()
 #     file.write(a)
 # print(url2.split("/")[0])
 
+
 # html = get_html(url)
 # print(html)
 # get_pages(html.text)
