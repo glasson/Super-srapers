@@ -3,8 +3,7 @@ from os import makedirs, path
 from csv import DictWriter
 from requests import post, get
 from copy import deepcopy
-from urllib.request import urlretrieve
-from urllib.request import urlopen
+import re
 
 LIMIT_ONE_REQ = 5
 BASE_URL = '/data'
@@ -189,14 +188,15 @@ def add_row(data, writer):
 def download_docs(id, docs, dir_path):
     if len(docs) == 0:
         return
-    docs_dir = f'{dir_path}/{id}'
+    docs_dir = f'{dir_path}/{id.split(".")[0]}'
 
     for doc in docs:
-        name_file = f"{doc['title'].split('.')[0]}.{doc['extension']}"
         try:
+            name_file = f"{doc['title'].split('.')[0]}.{doc['extension']}"
+            name_file = re.sub('/:*?"<>|', '', name_file)
             bin_file = get(doc['url'])
+            makedirs(docs_dir, exist_ok=True)
+            with open(f'{docs_dir}\\{name_file}', "wb") as file:
+                file.write(bin_file.content)
         except:
             continue
-        makedirs(docs_dir, exist_ok=True)
-        with open(f'{docs_dir}/{name_file}', "wb") as file:
-            file.write(bin_file.content)
