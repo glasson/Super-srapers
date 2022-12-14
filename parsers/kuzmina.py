@@ -41,7 +41,7 @@ def change_useragent():
     }
 
 
-def parsing_data(soup, dir_path):
+def parsing_data(soup, dir_path, count):
     try:
         tender_name = soup.find("table",
                                 class_="data-table data-table--header description__data-table description__data-table--header").find(
@@ -89,37 +89,31 @@ def parsing_data(soup, dir_path):
         customers = "ParseError"
     data = {
         "tender_number": tender_number.replace("\n", ""),
+        "tender_name": tender_name.replace("\n", ""),
         "order": "Нет информации",
         "tender_type": tender_type.replace("\n", ""),
         "start_value": start_value.replace("\n", ""),
         "start_date": start_date.replace("\n", ""),
         "end_date": end_date.replace("\n", ""),
         "tender_status": tender_status.replace("\n", ""),
-        "purchase_object": tender_name.replace("\n", ""),
         "customers": customers.replace("\n", ""),
         "docs": "Нет информации"
     }
+    print(f'{count}. {data["tender_name"]} (№{data["tender_number"]})')
     write_data(data, dir_path)
 
-def roseltorg(trade_name, dir_path):
+
+def roseltorg(trade_name, dir_path, _ = False):
     print('Парсим roseltorg.ru')
     pages = get_links()
+    count = 0
 
     for page in pages:
         url = f"https://www.roseltorg.ru{page}"
         r = requests.get(url, headers=change_useragent())
         soup = BeautifulSoup(r.text, "lxml")
-        parsing_data(soup, dir_path)
-
-
-def test():
-    pages = get_links()
-    url = f"https://www.roseltorg.ru{pages[0]}"
-    time_str = time.strftime("%Y%m%d-%H%M%S")
-    print(url)
-    r = requests.get(url, headers=change_useragent())
-    soup = BeautifulSoup(r.text, "lxml")
-    parsing_data(soup, time_str)
+        count += 1
+        parsing_data(soup, dir_path, count)
 
 
 def get_links():

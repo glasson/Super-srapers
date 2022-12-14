@@ -35,7 +35,7 @@ def parsing_table(soup):
 
 
 
-def parsing_data(soup, dir_path):
+def parsing_data(soup, dir_path, count):
     order = "Order undefined"
     delim = ','
     data_parse = []
@@ -71,10 +71,11 @@ def parsing_data(soup, dir_path):
         "customers": customers.text,
         "docs": "Нет информации"
     }
+    print(f'{count}. {data["tender_name"]} (№{data["tender_number"]})')
     write_data(data, dir_path)
 
 
-def zakupki360(search_query, dir_path):
+def zakupki360(search_query, dir_path, _ = False):
     print("Парсим zakupki360.ru")
     count = 0
     for i in range(1, 3):
@@ -86,7 +87,7 @@ def zakupki360(search_query, dir_path):
             url = "https://zakupki360.ru{}".format(link)
             r = requests.get(url)
             soup = BeautifulSoup(r.text, 'html.parser')
-            parsing_data(soup, dir_path)
+            parsing_data(soup, dir_path, count)
 
 
 def get_links(query):
@@ -105,4 +106,4 @@ def get_links(query):
 if __name__ == "__main__":
     search_query = input('Введите название тендера: ')
     dir_path = f'data/{search_query}'
-    zakupki360(search_query, dir_path)
+    zakupki360(search_query, dir_path, False)

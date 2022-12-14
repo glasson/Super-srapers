@@ -12,13 +12,16 @@ class KeywordParser:
     def __init__(self, keyword_request, dir_path):
         self.dir_path = dir_path
         self.url = self.make_url(keyword_request)
+        self.count = 0
         self.num_of_pages = int(self.number_of_pages(self.get_bs_page(self.url)))
 
     def start(self):
         for i in range(self.num_of_pages):
             refs = self.get_refs_from_page()
             for ref in refs:
+                self.count += 1
                 tender_data = self.get_tender_data(ref)
+                print(f'{self.count}. {tender_data["tender_name"]} (№{tender_data["tender_number"]})')
                 write_data(tender_data, self.dir_path)
             self.url = self.get_ref_to_next_page()
 
@@ -101,7 +104,7 @@ class KeywordParser:
         return url
 
 
-def synapsenet(kw_query, dir_path):
+def synapsenet(kw_query, dir_path, _=False):
     print("Парсим synapsenet.ru")
     parser = KeywordParser(kw_query, dir_path)
     parser.start()

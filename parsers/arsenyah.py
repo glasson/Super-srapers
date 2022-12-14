@@ -93,12 +93,16 @@ def save_doc(url_documentation, name, path):
             continue
 
 
-def fabricant(key_word, dir_path):
+def fabricant(key_word, dir_path, is_download = False):
     print("Парсим etp-ets.ru")
     html1 = get_html(host + url1, params={'q': key_word})
     html2 = get_html(host + url2, params={'q': key_word})
 
+    if html1.status_code != 200 and html2.status_code != 200:
+        return
+
     items = []
+    count = 0
 
     pages, _ = get_pages(html1.text)
     for p in range(1, pages + 1):
@@ -112,8 +116,11 @@ def fabricant(key_word, dir_path):
 
 
     for item in items:
+        count += 1
+        print(f'{count}. {item["title"]} (№{item["id_purchase"]})')
         write_data(item, dir_path)
-        save_doc(item['documentation'], item['id_purchase'], dir_path)
+        if is_download:
+            save_doc(item['documentation'], item['id_purchase'], dir_path)
 
 
 if __name__ == "__main__":

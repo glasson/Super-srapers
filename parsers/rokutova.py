@@ -34,7 +34,11 @@ headers = {
 }
 
 
-def parsing_data(response_json, dir_path):
+total = 0
+
+
+def parsing_data(response_json, dir_path, counter=0):
+    count = counter
     for data in response_json['invdata']:
         data = {
             "tender_number": data['TradeNumber'],
@@ -43,13 +47,15 @@ def parsing_data(response_json, dir_path):
             "tender_type": "No data",
             "start_value": data['InitialPrice'],
             "start_date": data['PublicationDate'],
-            "end_date": data[
-                'FillingApplicationEndDate'],
+            "end_date": data['FillingApplicationEndDate'],
             "tender_status": data['TradeStateName'],
             "customers": data['CustomerFullName'],
-            "docs": "No data"
+            "documents": "No data"
         }
+        count += 1
+        print(f'{count}. {data["tender_name"]} (№{data["tender_number"]})')
         write_data(data, dir_path)
+    return count
 
 
 def increase_page(value, trade_name):
@@ -86,12 +92,12 @@ def increase_page(value, trade_name):
             "tradeState": ""}
 
 
-def rts(trade_name, dir_path):
+def rts(trade_name, dir_path, _):
     print("Парсим rts-tender.ru")
     url = "https://zmo-new-webapi.rts-tender.ru/api/Trade/GetTradesForAnonymous"
     response = requests.request("POST", url, json=increase_page(0, trade_name), headers=headers)
     total_pages = response.json()['totalpages']
-    parsing_data(response.json(), dir_path)
+    count = parsing_data(response.json(), dir_path)
     total_pages = response.json()['totalpages']
     for i in range(1, total_pages + 1):
         payload = {"CustomerAddress": "", "CustomerFullNameOrInn": "", "FilterFillingApplicationEndDateTo": None,
@@ -106,10 +112,10 @@ def rts(trade_name, dir_path):
                    "page": f"{i}",
                    "showOnlyOwnTrades": True, "tradeName": trade_name, "tradeState": ""}
         response = requests.request("POST", url, json=payload)
-        parsing_data(response.json())
+        count = parsing_data(response.json(), dir_path, count)
 
 
 if __name__ == "__main__":
     search_query = input('Введите название тендера: ')
     dir_path = f'data/{search_query}'
-    rts(search_query, dir_path)
+    rts(search_query, dir_path, _)
