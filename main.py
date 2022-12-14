@@ -3,17 +3,17 @@ from os import makedirs
 from datetime import datetime
 import csv
 
-# rts, zakupki360, roseltorg, synapsenet
-# fabricant, rad
-parsers_list = [rts, zakupki360, roseltorg, synapsenet]
+# rts, zakupki360, roseltorg, synapsenet, rad
+# fabricant
+parsers_list = [rts, zakupki360, roseltorg, synapsenet, rad]
 
 
 def creating_csv(dir_path):
     with open('{}\\purchases.csv'.format(dir_path), "w", encoding="utf-8", newline='') as data_file:
         writer = csv.writer(data_file, delimiter=';')
         writer.writerow(
-            ("Название", "Номер", "Закон", "Вид", "Начальная цена", "Дата размещения", "Дата окончания тендера",
-             "Статус", "Объект закупки", "Заказчик", "Документация"))
+            ("Номер", "Объект закупки", "Закон", "Вид", "Начальная цена", "Дата размещения", "Дата окончания тендера",
+             "Статус", "Заказчик", "Документация"))
 
 
 def main():

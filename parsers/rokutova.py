@@ -37,8 +37,8 @@ headers = {
 def parsing_data(response_json, dir_path):
     for data in response_json['invdata']:
         data = {
-            "tender_name": data['TradeName'],
             "tender_number": data['TradeNumber'],
+            "tender_name": data['TradeName'],
             "order": data['ZmoFzTypeString'],
             "tender_type": "No data",
             "start_value": data['InitialPrice'],
@@ -46,7 +46,6 @@ def parsing_data(response_json, dir_path):
             "end_date": data[
                 'FillingApplicationEndDate'],
             "tender_status": data['TradeStateName'],
-            "purchase_object": "No data",
             "customers": data['CustomerFullName'],
             "docs": "No data"
         }

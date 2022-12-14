@@ -88,7 +88,6 @@ def parsing_data(soup, dir_path):
     except AttributeError:
         customers = "ParseError"
     data = {
-        "tender_name": tender_name.replace("\n", ""),
         "tender_number": tender_number.replace("\n", ""),
         "order": "Нет информации",
         "tender_type": tender_type.replace("\n", ""),

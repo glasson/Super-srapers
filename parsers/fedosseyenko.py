@@ -60,15 +60,14 @@ def parsing_data(soup, dir_path):
         order = "44-ФЗ"
     purchase_object = delim.join(parsing_table(soup))
     data = {
-        "tender_name": tender_name,
         "tender_number": data_parse[0],
+        "tender_name": purchase_object.strip(),
         "order": order,
         "tender_type": data_parse[1],
         "start_value": start_value.replace('\xa0', '').strip(),
         "start_date": start_date,
         "end_date": end_date,
         "tender_status": tender_status.text,
-        "purchase_object": purchase_object.strip(),
         "customers": customers.text,
         "docs": "Нет информации"
     }
@@ -105,5 +104,5 @@ def get_links(query):
 
 if __name__ == "__main__":
     search_query = input('Введите название тендера: ')
-    dir_path = 'data/test'
+    dir_path = f'data/{search_query}'
     zakupki360(search_query, dir_path)

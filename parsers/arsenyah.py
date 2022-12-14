@@ -15,8 +15,8 @@ HEADERS = {
 
 
 def get_html(url, params=''):
-    r = requests.get(url, headers=HEADERS, params=params)
-    return r
+    return requests.get(url, headers=HEADERS, params=params)
+
 
 def get_content_url2(html):
     soup = BeautifulSoup(html, 'html.parser')

@@ -1,25 +1,11 @@
 from os import makedirs, path
-from csv import DictWriter
 from requests import post, get
 from copy import deepcopy
+from ..common import write_data
 import re
 
-LIMIT_ONE_REQ = 5
+LIMIT_ONE_REQ = 10
 BASE_URL = '/data'
-
-FIELDS_DATA = {
-    'tender_number': 'Номер тендера',
-    'object': 'Объект тендера',
-    'type': 'Регулирующий закон / вид тура',
-    'status': 'Статус заявки',
-    'start_sum': 'Начальная сумма',
-    'publication_date': 'Дата размещений',
-    'end_date': 'Дата окончания',
-    'organization': 'Организация',
-    'documents': 'Документы'
-}
-
-FIELDS = list(FIELDS_DATA.keys())
 
 
 def get_const_req_body(name):
@@ -144,11 +130,12 @@ def get_list_tenders(name, offset):
         tender_data = {
             'tender_number': tender['purchaseNumber'],
             'object': tender['purchaseObjectInfo'],
+            'order': tender['typeName'],
             'type': tender['typeName'],
-            'status': tender['substatus'] or tender['status'],
             'start_sum': float(tender['maxSum'].replace(' ', '')),
             'publication_date': tender['publicationDateTime'],
             'end_date': tender['endDateTime'],
+            'status': tender['substatus'] or tender['status'],
             'organization': tender['placerFullName'],
             'documents': get_docs_tender(tender['number'])
         }
@@ -157,7 +144,7 @@ def get_list_tenders(name, offset):
     return list_tenders
 
 
-def add_row(data, writer):
+def add_row(data, dir_path):
     values = deepcopy(data)
     documents = list(map(lambda doc: "{}: {}".format(doc['title'], doc['url']), values['documents']))
 
@@ -165,7 +152,7 @@ def add_row(data, writer):
         values[key] = values[key] or ''
 
     values['documents'] = ', '.join(documents)
-    writer.writerow(values)
+    write_data(values, dir_path)
 
     return values['tender_number'], values['object'], data['documents']
 

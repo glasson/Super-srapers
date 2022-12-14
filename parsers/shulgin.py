@@ -41,8 +41,8 @@ class KeywordParser:
     def get_tender_data(self, url) -> list:
         tender_data = {}
         tender_content_bs = self.get_bs_page(url)
-        tender_data["tender_name"] = "Name tender" # TODO: сделать получение названия тендера
         tender_data["tender_number"] = tender_content_bs.find(class_="tct-tender-number").text.split()[1]
+        tender_data["tender_name"] = tender_content_bs.find(class_="tct-tender-text").text
         tender_data["order"] = self.get_law(tender_content_bs)
         tender_data["tender_type"] = self.get_type(tender_content_bs)
         money = tender_content_bs.find(class_="tender-money").text.replace("\xa0", " ")[:-1]
@@ -61,7 +61,6 @@ class KeywordParser:
             tender_data["tender_status"] = tender_content_bs.find(class_="tct-tender-text").next_sibling.find_all("div")[1].text
         except AttributeError:
             tender_data["tender_status"] = tender_content_bs.find(class_="tct-tender-text").next_sibling.next_sibling.find_all("div")[1].text
-        tender_data["purchase_object"] = tender_content_bs.find(class_="tct-tender-text").text
         tender_data["customers"] =  tender_content_bs.find(class_="tc-customer-name").text
         tender_data["docs"] =  "No documents"
         return tender_data
@@ -73,12 +72,9 @@ class KeywordParser:
         return refs
 
     @staticmethod
-    def get_bs_page(url: str):
+    def get_bs_page(url):
         request = requests.get(url, headers=header)
         content = request.text
-        with open("../page.html", "w", encoding='utf-8') as file:
-            file.write(content[1:])
-        file.close()
         return BeautifulSoup(content, "lxml")
 
     def get_ref_to_next_page(self):
@@ -109,3 +105,10 @@ def synapsenet(kw_query, dir_path):
     print("Парсим synapsenet.ru")
     parser = KeywordParser(kw_query, dir_path)
     parser.start()
+
+
+if __name__ == "__main__":
+    search_query = input('Введите название тендера: ')
+    dir_path = f'data/{search_query}'
+    synapsenet(search_query, dir_path)
+
