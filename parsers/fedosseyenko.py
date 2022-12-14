@@ -3,6 +3,7 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
+from .common import write_data
 
 headers = {'Accept-Language': "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
            "accept": "*/*",
@@ -11,23 +12,6 @@ headers = {'Accept-Language': "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
            "cache-control": "no-cache",
            "Connection": "keep-alive",
            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"}
-
-
-def write_data(data, timestr):
-    with open('{}.csv'.format(timestr), 'a', encoding="utf-8", newline='') as file:
-        writer = csv.writer(file, delimiter=';')
-        writer.writerow(data.values())
-        file.close()
-
-
-def creating_csv(timestr):
-    with open('{}.csv'.format(timestr), "w", encoding="utf-8", newline='') as data_file:
-        writer = csv.writer(data_file, delimiter=';')
-        writer.writerow(
-            ("Название", "Номер", "Закон", "Вид", "Начальная цена", "Дата размещения", "Дата окончания тендера",
-             "Статус",
-             "Объект закупки", "Заказчик"))
-    data_file.close()
 
 
 def parsing_table(soup):
@@ -51,7 +35,7 @@ def parsing_table(soup):
 
 
 
-def parsing_data(soup, timestr):
+def parsing_data(soup, dir_path):
     order = "Order undefined"
     delim = ','
     data_parse = []
@@ -87,24 +71,22 @@ def parsing_data(soup, timestr):
         "purchase_object": purchase_object.strip(),
         "customers": customers.text
     }
-    write_data(data, timestr)
+    write_data(data, dir_path)
 
 
-def parse():
+def zakupki360(search_query, dir_path):
+    print("Парсим zakupki360.ru")
     count = 0
-    timestr = time.strftime("%Y%m%d-%H%M%S")
-    creating_csv(timestr)
     for i in range(1, 3):
         page = "&page={}".format(i)
-        query = '{}{}'.format(input("Введите запрос\n"), page)
+        query = '{}{}'.format(search_query, page)
         links = get_links(query)
         for link in links:
             count += 1
             url = "https://zakupki360.ru{}".format(link)
             r = requests.get(url)
             soup = BeautifulSoup(r.text, 'html.parser')
-            parsing_data(soup, timestr)
-            print("Запарсено страниц: {}".format(count))
+            parsing_data(soup, dir_path)
 
 
 def get_links(query):
@@ -119,9 +101,8 @@ def get_links(query):
         links.append(link["href"])
     return links
 
-def main():
-    parse()
-
 
 if __name__ == "__main__":
-    main()
+    search_query = input('Введите название тендера: ')
+    dir_path = 'data/test'
+    zakupki360(search_query, dir_path)

@@ -1,10 +1,9 @@
-import csv
 import time
 from random import choice
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 import re
+from .common import write_data
 
 querystring = {"sale": "0", "query_fiel": "Поставка", "status^%^5B^%^5D": ["5", "0"], "currency": "all", "page": 1}
 desktop_agents = [
@@ -42,24 +41,7 @@ def change_useragent():
     }
 
 
-def write_data(data, time_str):
-    with open('{}.csv'.format(time_str), 'a', encoding="utf-8", newline='') as file:
-        writer = csv.writer(file, delimiter=';')
-        writer.writerow(data.values())
-        file.close()
-
-
-def creating_csv(time_str):
-    with open('{}.csv'.format(time_str), "w", encoding="utf-8", newline='') as data_file:
-        writer = csv.writer(data_file, delimiter=';')
-        writer.writerow(
-            ("Название", "Номер", "Закон", "Вид", "Начальная цена", "Дата размещения", "Дата окончания тендера",
-             "Статус",
-             "Объект закупки", "Заказчик"))
-    data_file.close()
-
-
-def parsing_data(soup, time_str):
+def parsing_data(soup, dir_path):
     try:
         tender_name = soup.find("table",
                                 class_="data-table data-table--header description__data-table description__data-table--header").find(
@@ -117,17 +99,17 @@ def parsing_data(soup, time_str):
         "purchase_object": tender_name.replace("\n", ""),
         "customers": customers.replace("\n", "")
     }
-    write_data(data, time_str)
+    write_data(data, dir_path)
 
-def main():
+def roseltorg(trade_name, dir_path):
+    print('Парсим roseltorg.ru')
     pages = get_links()
-    time_str = time.strftime("%Y%m%d-%H%M%S")
-    creating_csv(time_str)
+
     for page in pages:
         url = f"https://www.roseltorg.ru{page}"
         r = requests.get(url, headers=change_useragent())
         soup = BeautifulSoup(r.text, "lxml")
-        parsing_data(soup, time_str)
+        parsing_data(soup, dir_path)
 
 
 def test():
@@ -156,4 +138,6 @@ def get_links():
 
 
 if __name__ == "__main__":
-    main()
+    search_query = input('Введите название тендера: ')
+    dir_path = f'data/{search_query}'
+    roseltorg(search_query, dir_path)

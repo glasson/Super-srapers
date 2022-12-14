@@ -1,4 +1,3 @@
-from datetime import datetime
 from os import makedirs, path
 from csv import DictWriter
 from requests import post, get
@@ -156,20 +155,6 @@ def get_list_tenders(name, offset):
         list_tenders.append(tender_data)
 
     return list_tenders
-
-
-def create_dir_tenders(name):
-    base_path = path.dirname(path.realpath(__file__))
-    now = datetime.now().strftime("%d%m%Y%H%M%S")
-    dir_path = f'{base_path}{BASE_URL}/{name}_{now}'
-    makedirs(dir_path, exist_ok=True)
-    file_name = f'{dir_path}\\purchase.csv'
-    sheet_file = open(file_name, "w", newline='', encoding='utf-8-sig')
-
-    writer = DictWriter(sheet_file, fieldnames=FIELDS)
-    writer.writerow(FIELDS_DATA)
-
-    return writer, sheet_file, dir_path
 
 
 def add_row(data, writer):

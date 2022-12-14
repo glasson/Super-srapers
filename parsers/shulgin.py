@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
-import csv
+from .common import write_data
 
 header = {
     "Accept": "*/*",
@@ -9,13 +9,8 @@ header = {
 
 
 class KeywordParser:
-    def __init__(self, keyword_request):
-        with open("data.csv", "w", newline='') as data_file:
-            writer = csv.writer(data_file, delimiter=';')
-            writer.writerow(
-                ("Номер", "Закон", "Вид", "Начальная цена", "Дата размещения", "Дата окончания тендера", "Статус",
-                 "Объект закупки", "Заказчик"))
-        data_file.close()
+    def __init__(self, keyword_request, dir_path):
+        self.dir_path = dir_path
         self.url = self.make_url(keyword_request)
         self.num_of_pages = int(self.number_of_pages(self.get_bs_page(self.url)))
 
@@ -24,7 +19,7 @@ class KeywordParser:
             refs = self.get_refs_from_page()
             for ref in refs:
                 tender_data = self.get_tender_data(ref)
-                self._write_data(tender_data)
+                write_data(tender_data)
             self.url = self.get_ref_to_next_page()
 
     @staticmethod
@@ -80,7 +75,7 @@ class KeywordParser:
     def get_bs_page(url: str):
         request = requests.get(url, headers=header)
         content = request.text
-        with open("page.html", "w", encoding='utf-8') as file:
+        with open("../page.html", "w", encoding='utf-8') as file:
             file.write(content[1:])
         file.close()
         return BeautifulSoup(content, "lxml")
@@ -98,14 +93,6 @@ class KeywordParser:
         except:
             raise Exception("Нет страниц")
 
-
-    @staticmethod
-    def _write_data(tender_data):
-        with open("data.csv", "a", newline='', encoding='windows-1251') as file:
-            writer = csv.writer(file, delimiter=';')
-            writer.writerow(tender_data)
-        file.close()
-
     @staticmethod
     def make_url(keyword_request):
         url = "https://synapsenet.ru/search/tenderi-po-regionam?query="
@@ -117,6 +104,7 @@ class KeywordParser:
         return url
 
 
-kw_query: str = ""
-parser = KeywordParser(kw_query)
-parser.start()
+def synapsenet(kw_query, dir_path):
+    print("Парсим synapsenet.ru")
+    parser = KeywordParser(kw_query, dir_path)
+    parser.start()

@@ -42,7 +42,7 @@ def get_content_url2(html):
 def get_content_url1(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = soup.find('tbody').find_all('tr')
-    # print(items)
+    print(items)
     purchase = []
     for item in items:
         purchase.append(
@@ -103,8 +103,8 @@ def save_csv(items, path):
                              item['start_price'], item['customer'],
                              item['date_publication'], item['date_end'], item['status']])
 
-def parser():
-    key_word = input('Задайте ключевое слово по которому будут искать все заказы: ')
+def fabricant(key_word):
+    print("Парсим etp-ets.ru")
     html1 = get_html(host + url1, params={'q': key_word})
     html2 = get_html(host + url2, params={'q': key_word})
     if html1.status_code != 200:
@@ -113,7 +113,8 @@ def parser():
     if html2.status_code != 200:
         print('error')
         return
-    while(True):
+
+    while True:
         try:
             os.mkdir(key_word)
             os.mkdir(f'{key_word}/223')
@@ -134,8 +135,10 @@ def parser():
                 else:
                     print('Неверный ввод, попробуйте ещё раз')
             break
+
     items223 = []
     items44 = []
+
     pages, elements = get_pages(html1.text)
     print(f'По вашему запросу нашлось:\n'
           f'{elements} заказов\n'
@@ -143,7 +146,8 @@ def parser():
     page = 0
     flag1 = 0
     flag2 = 0
-    while(True):
+
+    while True:
         if pages < 1:
             print('по вашему запросу ничего не нашлось')
             flag1 = 1
@@ -153,6 +157,7 @@ def parser():
             print('Неверный ввод, попробуйте ещё раз')
         else:
             break
+
     if flag1 == 0:
         for p in range(1, page+1):
             print(f'парсим страницу: {p}')
@@ -164,7 +169,8 @@ def parser():
           f'{elements} заказов\n'
           f'{pages} страниц с заказами')
     page = 0
-    while (True):
+
+    while True:
         if pages < 1:
             print('по вашему запросу ничего не нашлось')
             flag2 = 1
@@ -174,6 +180,7 @@ def parser():
             print('Неверный ввод, попробуйте ещё раз')
         else:
             break
+
     if flag2 == 0:
         for p in range(1, page + 1):
             print(f'парсим страницу: {p}')
@@ -197,19 +204,6 @@ def parser():
             save_doc(item['documentation'], name)
 
 
-    # print(page)
-    # print(pages)
-
-parser()
-# a = requests.get('https://zakupki.gov.ru/223/purchase/public/download/download.html?id=68520271').content
-# with open('Приложение №2 к ЗД_Заявка на участие_Ценовое_предложение.xlsx', 'wb') as file:
-#     file.write(a)
-# print(url2.split("/")[0])
-
-
-# html = get_html(url)
-# print(html)
-# get_pages(html.text)
-# print(get_content(html.text))
-
-
+if __name__ == "__main__":
+    search_query = input('Введите название тендера: ')
+    fabricant(search_query)

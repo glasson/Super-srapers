@@ -1,7 +1,6 @@
 import requests
 from random import choice
-import csv
-import time
+from .common import write_data
 
 desktop_agents = [
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
@@ -35,24 +34,7 @@ headers = {
 }
 
 
-def write_data(data, timestr):
-    with open('{}.csv'.format(timestr), 'a', encoding="utf-8", newline='') as file:
-        writer = csv.writer(file, delimiter=';')
-        writer.writerow(data.values())
-        file.close()
-
-
-def creating_csv(timestr):
-    with open('{}.csv'.format(timestr), "w", encoding="utf-8", newline='') as data_file:
-        writer = csv.writer(data_file, delimiter=';')
-        writer.writerow(
-            ("Название", "Номер", "Закон", "Вид", "Начальная цена", "Дата размещения", "Дата окончания тендера",
-             "Статус",
-             "Объект закупки", "Заказчик"))
-    data_file.close()
-
-
-def parsing_data(response_json, timestr):
+def parsing_data(response_json, dir_path):
     for data in response_json['invdata']:
         data = {
             "tender_name": data['TradeName'],
@@ -67,7 +49,7 @@ def parsing_data(response_json, timestr):
             "purchase_object": "No data",
             "customers": data['CustomerFullName']
         }
-        write_data(data, timestr)
+        write_data(data, dir_path)
 
 
 def increase_page(value, trade_name):
@@ -104,19 +86,13 @@ def increase_page(value, trade_name):
             "tradeState": ""}
 
 
-def main():
-    trade_name = input()
+def rts(trade_name, dir_path):
+    print("Парсим rts-tender.ru")
     url = "https://zmo-new-webapi.rts-tender.ru/api/Trade/GetTradesForAnonymous"
     response = requests.request("POST", url, json=increase_page(0, trade_name), headers=headers)
     total_pages = response.json()['totalpages']
-    if total_pages == 0:
-        print("По такому запросу нет данных.")
-        exit(0)
-    time_str = time.strftime("%Y%m%d-%H%M%S")
-    creating_csv(time_str)
-    parsing_data(response.json(), time_str)
+    parsing_data(response.json(), dir_path)
     total_pages = response.json()['totalpages']
-    print("Всего страниц: ", total_pages)
     for i in range(1, total_pages + 1):
         payload = {"CustomerAddress": "", "CustomerFullNameOrInn": "", "FilterFillingApplicationEndDateTo": None,
                    "IsExpire": False, "IsImmediate": False, "OnlyTradesWithMyApplications": False,
@@ -129,10 +105,11 @@ def main():
                    "filterPriceMax": "", "filterPriceMin": "", "filterTradeEasuzNumber": "", "itemsPerPage": 10,
                    "page": f"{i}",
                    "showOnlyOwnTrades": True, "tradeName": trade_name, "tradeState": ""}
-        print("Запарсено страниц: {}".format(i + 1))
         response = requests.request("POST", url, json=payload)
-        parsing_data(response.json(), time_str)
+        parsing_data(response.json())
 
 
 if __name__ == "__main__":
-    main()
+    search_query = input('Введите название тендера: ')
+    dir_path = f'data/{search_query}'
+    rts(search_query, dir_path)
