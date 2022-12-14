@@ -3,9 +3,8 @@ from os import makedirs
 from datetime import datetime
 import csv
 
-# rts, zakupki360, roseltorg, synapsenet, rad
-# fabricant
-parsers_list = [rts, zakupki360, roseltorg, synapsenet, rad]
+# rts, zakupki360, roseltorg, synapsenet, rad, fabricant
+parsers_list = [rts, zakupki360, roseltorg, synapsenet, rad, fabricant]
 
 
 def creating_csv(dir_path):
@@ -19,7 +18,7 @@ def creating_csv(dir_path):
 def main():
     search_query = input('Введите ключевое слово: ')
 
-    now = datetime.now().strftime("%d%m%Y%H%M%S")
+    now = datetime.now().strftime("%d-%m-%y_%H-%M-%S")
     dir_path = f'data/{search_query}_{now}'
     makedirs(dir_path, exist_ok=True)
 
