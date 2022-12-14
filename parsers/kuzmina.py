@@ -97,7 +97,8 @@ def parsing_data(soup, dir_path):
         "end_date": end_date.replace("\n", ""),
         "tender_status": tender_status.replace("\n", ""),
         "purchase_object": tender_name.replace("\n", ""),
-        "customers": customers.replace("\n", "")
+        "customers": customers.replace("\n", ""),
+        "docs": "Нет информации"
     }
     write_data(data, dir_path)
 

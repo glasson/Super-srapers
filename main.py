@@ -3,8 +3,9 @@ from os import makedirs
 from datetime import datetime
 import csv
 
-# fabricant, rad, synapsenet
-parsers_list = [rts, zakupki360, roseltorg]
+# rts, zakupki360, roseltorg, synapsenet
+# fabricant, rad
+parsers_list = [rts, zakupki360, roseltorg, synapsenet]
 
 
 def creating_csv(dir_path):

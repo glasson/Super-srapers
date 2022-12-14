@@ -19,7 +19,7 @@ class KeywordParser:
             refs = self.get_refs_from_page()
             for ref in refs:
                 tender_data = self.get_tender_data(ref)
-                write_data(tender_data)
+                write_data(tender_data, self.dir_path)
             self.url = self.get_ref_to_next_page()
 
     @staticmethod
@@ -39,30 +39,31 @@ class KeywordParser:
             return bs_page.find(class_="tender-sourse-point").next_sibling.next_sibling.text.split('•')[1].split()[0]
 
     def get_tender_data(self, url) -> list:
-        tender_data = []
+        tender_data = {}
         tender_content_bs = self.get_bs_page(url)
-        tender_data.append(tender_content_bs.find(class_="tct-tender-number").text.split()[1])
-        tender_data.append(self.get_law(tender_content_bs))
-        tender_data.append(self.get_type(tender_content_bs))
+        tender_data["tender_name"] = "Name tender" # TODO: сделать получение названия тендера
+        tender_data["tender_number"] = tender_content_bs.find(class_="tct-tender-number").text.split()[1]
+        tender_data["order"] = self.get_law(tender_content_bs)
+        tender_data["tender_type"] = self.get_type(tender_content_bs)
         money = tender_content_bs.find(class_="tender-money").text.replace("\xa0", " ")[:-1]
         if money == "не указан":
-            tender_data.append("-")
+            tender_data["start_value"] = "-"
         else:
-            tender_data.append(money)
+            tender_data["start_value"] = money
 
         try:
             time = tender_content_bs.find(class_="tender-time-noline").find_all(title="по московскому времени")
         except AttributeError:
             time = tender_content_bs.find(class_="tender-time-line").find_all(title="по московскому времени")
-        tender_data.append(time[0].text)  # появление заявки
-        tender_data.append(time[1].text)  # ее окончание
+        tender_data["start_date"] = time[0].text # появление заявки
+        tender_data["end_date"] = time[1].text  # ее окончание
         try:
-            tender_data.append(tender_content_bs.find(class_="tct-tender-text").next_sibling.find_all("div")[1].text)
+            tender_data["tender_status"] = tender_content_bs.find(class_="tct-tender-text").next_sibling.find_all("div")[1].text
         except AttributeError:
-            tender_data.append(
-                tender_content_bs.find(class_="tct-tender-text").next_sibling.next_sibling.find_all("div")[1].text)
-        tender_data.append(tender_content_bs.find(class_="tct-tender-text").text)  # обьект закупки
-        tender_data.append(tender_content_bs.find(class_="tc-customer-name").text)  # заказчик
+            tender_data["tender_status"] = tender_content_bs.find(class_="tct-tender-text").next_sibling.next_sibling.find_all("div")[1].text
+        tender_data["purchase_object"] = tender_content_bs.find(class_="tct-tender-text").text
+        tender_data["customers"] =  tender_content_bs.find(class_="tc-customer-name").text
+        tender_data["docs"] =  "No documents"
         return tender_data
 
     def get_refs_from_page(self):

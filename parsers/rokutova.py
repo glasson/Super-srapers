@@ -47,7 +47,8 @@ def parsing_data(response_json, dir_path):
                 'FillingApplicationEndDate'],
             "tender_status": data['TradeStateName'],
             "purchase_object": "No data",
-            "customers": data['CustomerFullName']
+            "customers": data['CustomerFullName'],
+            "docs": "No data"
         }
         write_data(data, dir_path)
 

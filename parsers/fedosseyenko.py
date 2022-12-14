@@ -69,7 +69,8 @@ def parsing_data(soup, dir_path):
         "end_date": end_date,
         "tender_status": tender_status.text,
         "purchase_object": purchase_object.strip(),
-        "customers": customers.text
+        "customers": customers.text,
+        "docs": "Нет информации"
     }
     write_data(data, dir_path)
 
