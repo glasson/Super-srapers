@@ -116,12 +116,12 @@ def roseltorg(trade_name, dir_path, _ = False):
         parsing_data(soup, dir_path, count)
 
 
-def get_links():
+def get_links(trade_name):
     url = "https://www.roseltorg.ru/procedures/search_ajax"
     pages = []
     page = 0
     for page in range(2):
-        query_string = {"sale": "0", "query_field": "Разработка", "status^%^5B^%^5D": ["21", "0"], "currency": "all",
+        query_string = {"sale": "0", "query_field": trade_name, "status^%^5B^%^5D": ["21", "0"], "currency": "all",
                         "page": page}
         response = requests.request("GET", url, data=payload, headers=change_useragent(), params=query_string)
         soup = BeautifulSoup(response.text, 'lxml')
