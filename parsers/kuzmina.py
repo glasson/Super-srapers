@@ -105,7 +105,7 @@ def parsing_data(soup, dir_path, count):
 
 def roseltorg(trade_name, dir_path, _ = False):
     print('Парсим roseltorg.ru')
-    pages = get_links()
+    pages = get_links(trade_name)
     count = 0
 
     for page in pages:
