@@ -60,9 +60,6 @@ def parsing_data(soup, dir_path, count):
         start_date = "ParseError"
     try:
         end_date = soup.find("time", class_="lot-item__time").text.strip().replace("до", "")
-    except AttributeError:
-        end_date = "ParseError"
-    try:
         end_date = re.split(r'[(]\d', end_date)[0].strip()
     except AttributeError:
         end_date = "ParseError"
