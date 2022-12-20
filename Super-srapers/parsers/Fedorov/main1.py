@@ -1,4 +1,4 @@
-from .engine import LIMIT_ONE_REQ, get_count_tenders, get_list_tenders, add_row, download_docs
+from engine import LIMIT_ONE_REQ, get_count_tenders, get_list_tenders, add_row, download_docs
 
 
 def rad(search_query, dir_path, is_download = False):
@@ -18,6 +18,4 @@ def rad(search_query, dir_path, is_download = False):
 
 
 if __name__ == '__main__':
-    search_query = input('Введите название тендера: ')
-    dir_path = f'data/{search_query}'
-    rad(search_query, dir_path, False)
+    print(1)

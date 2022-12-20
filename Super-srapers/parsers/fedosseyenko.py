@@ -41,7 +41,10 @@ def parsing_data(soup, dir_path, count):
     delim = ','
     data_parse = []
     tender_status = soup.find("div", class_='status')
-    tender_name = soup.find("h1", class_='dossier__title').text
+    try:
+        tender_name = soup.find("h1", class_='dossier__title').text
+    except:
+        tender_name = ''
     start_date = soup.find("div", class_='dossier__column data').get_text().replace("Размещено:", "")
     end_date = soup.find("meta", itemprop='endDate')["content"]
     if end_date.isspace():

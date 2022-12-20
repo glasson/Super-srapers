@@ -19,6 +19,6 @@ FIELDS_NAME = list(FIELDS_DATA.values())
 
 
 def write_data(data, dir_path):
-    with open(f'{dir_path}/purchases.csv', 'a', encoding="utf-16", newline='') as file:
+    with open(f'{dir_path}/purchases.csv', 'a', encoding="Windows-1251", newline='') as file:
         writer = csv.writer(file, delimiter=';')
         writer.writerow(list(data.values()))
